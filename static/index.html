@@ -1,0 +1,120 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>hangin</title>
+        <link rel="stylesheet" href="/css/index.css">
+        <script src="/socket.io/socket.io.js"></script>
+    </head>
+    <body class="EI1Dfe">
+        <div class="sdnj">⋮</div>
+        <div class="s01">
+            <div class="Glc">
+                <div class = "fBl">
+                    <span> 메시지 숨기기 ᐯ</span>
+                </div>
+            </div>
+            <div class="vCsV6b" id="chat">
+
+            </div>
+            <div class = "Hclsdd">
+            </div>
+            <div class="Dw">
+                <div class="lop"></div>
+                <div role="button" class="Rdw">
+                    <div class="Rve">
+                        <span class="DP">←</span>
+                    </div>
+                </div>
+                <div class="d8">
+                    <div class="aCs">
+                        <div class="aXt" id="in">
+                            <input id="ipnut" onkeyup="if(window.event.keyCode==13){enter()}" onchange="f2()" class="whs" type="text" maxlength="500" data-initial-value badinput="false" autocomplete="off" tabindex="0">
+                            <div class="ndJ" id="msg">통화에 있는 모든 사용자에게 메시지를 보냅니다.</div>
+                        </div>
+                        <div class="jca" id="green"></div>
+                    </div>
+                </div>
+        </div>
+        <script>
+            var socket=io();
+            
+            socket.on('connect', function(){
+                var usr_name = prompt('닉네임을 입력.','');
+                if(!usr_name){
+                    usr_name='tmp';}
+                socket.emit('newUser', usr_name)
+            })
+
+            var green = document.getElementById('green');
+            var inp = document.getElementById('ipnut');
+
+            var ms = document.getElementById('msg');
+            var chat = document.getElementById('chat');
+
+            inp.onclick = function(){
+                var inp_vl = document.getElementById('ipnut').value;
+                green.classList.add('Oab');
+                if (inp_vl!="") ms.classList.add("nd");
+
+            }
+
+            function f2(){
+                var inp_vl = document.getElementById('ipnut').value;
+                green.classList.remove('Oab');
+                if (inp_vl=="") ms.classList.remove("nd");
+            }
+
+            function enter(){
+                var inp_vl = document.getElementById('ipnut').value;
+                
+                var ti = new Date();
+                var mmsg = "";
+                var hour = ti.getHours();
+                if (hour>12){
+                    mmsg="오후 ";
+                    mmsg+=hour-12+":";
+                }
+                else {mmsg="오전 "; mmsg+=hour+":";}
+                if (inp_vl!=""){
+                    socket.emit('send',{msg:inp_vl, name:""})
+                    var box1 = document.createElement('div');
+                    var txt = document.createTextNode("나"+"  "+inp_vl);
+                    
+                    box1.setAttribute('class','word');
+                    box1.appendChild(txt);
+                    chat.append(box1);
+                    
+                    var box = document.createElement('div');
+                    var txt = document.createTextNode(mmsg+ti.getMinutes());
+                    box.setAttribute('class','tim');
+                    box.appendChild(txt);
+                    chat.append(box);
+                }
+                inp.value="";
+                chat.scrollTop = chat.scrollHeight;
+            }
+
+            socket.on('update',function(data){
+                var ti = new Date();
+                var mmsg = "";
+                var hour = ti.getHours();
+                if (hour>12){
+                    mmsg="오후 ";
+                    mmsg+=hour-12+":";
+                }
+                else {mmsg="오전 "; mmsg+=hour+":";}
+                var box1 = document.createElement('div');
+                var txt = document.createTextNode(data.name+"  "+data.msg);
+                    
+                box1.setAttribute('class','word');
+                box1.appendChild(txt);
+                chat.append(box1);
+                    
+                var box = document.createElement('div');
+                var txt = document.createTextNode(mmsg+ti.getMinutes());
+                box.setAttribute('class','tim');
+                box.appendChild(txt);
+                chat.append(box);
+            })
+        </script>
+    </body>
